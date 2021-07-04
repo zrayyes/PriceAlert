@@ -3,6 +3,7 @@
 ## Todo
 - ~~Add Dockerfile for Go service~~
 - ~~Add Docker Compose file~~
-- Add Kafka, Mailhog Dockerfiles
+- ~~Finish REST API~~
 - Add RAML document
+- Add Kafka, Mailhog Dockerfiles
 - Add tests for business logic

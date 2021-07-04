@@ -6,4 +6,4 @@ services:
         volumes:
             - ./price-alert:/price-alert
         ports:
-            - 5001:5001
+            - 5001:8080

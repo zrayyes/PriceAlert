@@ -1,18 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
+	"github.com/gin-gonic/gin"
+	"github.com/zrayyes/PriceAlert/src/controllers"
+	"github.com/zrayyes/PriceAlert/src/models"
 )
 
-func helloHandler(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintf(writer, "Hello World, %s!", request.URL.Path[1:])
-}
-
 func main() {
-	PORT := 5001
-	http.HandleFunc("/", helloHandler)
-	log.Println(fmt.Sprintf("Listing for requests at http://localhost:%d", PORT))
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil))
+	r := gin.Default()
+
+	models.ConnectDataBase()
+	models.PopulateDataBase()
+
+	r.GET("/alerts", controllers.FindAlerts)
+	r.POST("/alerts", controllers.CreateAlert)
+	r.GET("/alerts/:id", controllers.FindAlert)
+	r.PATCH("/alerts/:id", controllers.UpdateAlert)
+	r.DELETE("/alerts/:id", controllers.DeleteAlert)
+	r.Run()
 }
