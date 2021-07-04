@@ -1,0 +1,122 @@
+#%RAML 1.0
+title: Price Alert Service
+baseUri: localhost:5001
+
+traits:
+  alertNotFound:
+      responses:
+        '400':
+          body:
+            application/json:
+                example: |
+                  {
+                    "error": "Not found!"
+                  }
+
+/alerts:
+  get:
+    description: Get a list of all price alerts
+    responses:
+      '200':
+        body:
+          application/json:
+              example: |
+                {
+                    "data": [
+                        {
+                            "id": 1,
+                            "email": "Blo558@gmail.com",
+                            "coin": "BTC",
+                            "price": 35650.2,
+                            "active": true
+                        },
+                        {
+                            "id": 2,
+                            "email": "xdy123@yahoo.com",
+                            "coin": "ETC",
+                            "price": 2336.27,
+                            "active": true
+                        }
+                    ]
+                }
+  post:
+    description: Create new price alert
+    body:
+      application/json:
+          example: |
+            {
+                "email":"Bryan890@gmail.com",
+                "coin":"BTC",
+                "price": 35424.17
+            }
+    responses:
+      '200':
+        body:
+          application/json:
+            example: |
+              {
+                "data": {
+                    "id": 4,
+                    "email": "Bryan890@gmail.com",
+                    "coin": "BTC",
+                    "price": 35424.17,
+                    "active": true
+                }
+              }
+      '400':
+        body:
+          application/json:
+            example: |
+              {
+                  "error": "Key: 'CreateAlertInput.Email' Error:Field validation for 'Email' failed on the 'required' tag"
+              }
+  /{id}:
+    is: [alertNotFound]
+    get:
+      description: Get details on a single price alert
+      responses:
+        '200':
+          body:
+            application/json:
+                example: |
+                  {
+                      "data": {
+                              "id": 1,
+                              "email": "Blo558@gmail.com",
+                              "coin": "BTC",
+                              "price": 35650.2,
+                              "active": true
+                      }
+                  }
+    patch:
+      description: Update an existing price alert
+      body:
+        application/json:
+            example: |
+              {
+                "active": false
+              }
+      responses:
+        '200':
+          body:
+            application/json:
+                example: |
+                  {
+                      "data": {
+                              "id": 1,
+                              "email": "Blo558@gmail.com",
+                              "coin": "BTC",
+                              "price": 35650.2,
+                              "active": false
+                      }
+                  }
+    delete:
+      description: Delete an existing price alert
+      responses:
+        '200':
+          body:
+            application/json:
+                example: |
+                  {
+                      "data": true
+                  }
