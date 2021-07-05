@@ -13,6 +13,11 @@ func main() {
 	models.SetupDatabase()
 	models.PopulateDataBase()
 
+	// Kafka
+	models.CreateTopic()
+	go models.Consume()
+	go models.Produce()
+
 	r.GET("/alerts", controllers.FindAlerts)
 	r.POST("/alerts", controllers.CreateAlert)
 	r.GET("/alerts/:id", controllers.FindAlert)

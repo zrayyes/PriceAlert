@@ -7,3 +7,9 @@ services:
             - ./price-alert:/price-alert
         ports:
             - 5001:8080
+    kafka:
+        image: lensesio/fast-data-dev:latest
+        ports:
+            - 5002:3030
+        environment:
+            - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
