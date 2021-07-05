@@ -10,6 +10,7 @@ func main() {
 	r := gin.Default()
 
 	models.ConnectDataBase()
+	models.SetupDatabase()
 	models.PopulateDataBase()
 
 	r.GET("/alerts", controllers.FindAlerts)

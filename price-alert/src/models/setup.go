@@ -14,12 +14,14 @@ func ConnectDataBase() {
 		panic("Failed to connect to database!")
 	}
 
-	// Clear any existing table
-	database.DropTable(&Alert{})
-	// Migrate schema
-	database.AutoMigrate(&Alert{})
-
 	DB = database
+}
+
+func SetupDatabase() {
+	// Clear any existing table
+	DB.DropTable(&Alert{})
+	// Migrate schema
+	DB.AutoMigrate(&Alert{})
 }
 
 func PopulateDataBase() {
