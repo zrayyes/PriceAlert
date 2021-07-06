@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"time"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/segmentio/kafka-go"
+	"github.com/zrayyes/PriceAlert/producer/models"
 )
 
 const (
@@ -16,6 +17,7 @@ const (
 	brokerAddress = "kafka:9092"
 )
 
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var ctx = context.Background()
 
 func CreateTopic() {
@@ -36,9 +38,9 @@ func Produce() {
 	})
 
 	for {
+		alert, _ := json.Marshal(&models.Alert{ID: 1, Email: "Blo558@gmail.com", Coin: "BTC", Price: 35650.20})
 		err := w.WriteMessages(ctx, kafka.Message{
-			Key:   []byte(strconv.Itoa(i)),
-			Value: []byte("this is message" + strconv.Itoa(i)),
+			Value: []byte(alert),
 		})
 		if err != nil {
 			panic("could not write message " + err.Error())
@@ -46,7 +48,7 @@ func Produce() {
 
 		fmt.Println("writes:", i)
 		i++
-		time.Sleep(time.Second)
+		time.Sleep(time.Second * 10)
 	}
 }
 
