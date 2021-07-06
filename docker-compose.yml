@@ -5,6 +5,8 @@ services:
         build: ./price-alert
         volumes:
             - ./price-alert:/price-alert
+        environment: 
+            - PORT=8080
         ports:
             - 5001:8080
     kafka:
