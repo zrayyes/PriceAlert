@@ -5,6 +5,7 @@ services:
         build: ./price-alert
         volumes:
             - ./price-alert:/price-alert
+            - home:/home
         environment: 
             - PORT=8080
         ports:
@@ -27,3 +28,7 @@ services:
         build: ./producer
         volumes:
             - ./producer:/producer
+            - home:/home
+
+volumes:
+    home:

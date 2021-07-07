@@ -28,31 +28,30 @@ func CreateTopic() {
 }
 
 func Produce() {
-	i := 0
-
-	l := log.New(os.Stdout, "kafka writer: ", 0)
-	w := kafka.NewWriter(kafka.WriterConfig{
+	kafkaWriter := kafka.NewWriter(kafka.WriterConfig{
 		Brokers: []string{brokerAddress},
 		Topic:   topic,
-		Logger:  l,
+		Logger:  log.New(os.Stdout, "kafka writer: ", 0),
 	})
 
 	for {
-		alert, _ := json.Marshal(&models.Alert{ID: 1, Email: "Blo558@gmail.com", Coin: "BTC", Price: 35650.20})
-		err := w.WriteMessages(ctx, kafka.Message{
-			Value: []byte(alert),
+		var alert models.Alert
+		models.DB.Take(&alert, 1)
+		alertJSON, _ := json.Marshal(&alert)
+
+		err := kafkaWriter.WriteMessages(ctx, kafka.Message{
+			Value: alertJSON,
 		})
 		if err != nil {
-			panic("could not write message " + err.Error())
+			fmt.Println("could not write message " + err.Error())
 		}
 
-		fmt.Println("writes:", i)
-		i++
 		time.Sleep(time.Second * 10)
 	}
 }
 
 func main() {
+	models.ConnectDataBase()
 	CreateTopic()
 	Produce()
 }

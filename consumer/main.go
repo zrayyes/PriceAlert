@@ -28,16 +28,15 @@ func CreateTopic() {
 }
 
 func Consume() {
-	l := log.New(os.Stdout, "kafka reader: ", 0)
-	r := kafka.NewReader(kafka.ReaderConfig{
+	kafkaReader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{brokerAddress},
 		Topic:   topic,
 		GroupID: "my-group",
-		Logger:  l,
+		Logger:  log.New(os.Stdout, "kafka reader: ", 0),
 	})
 
 	for {
-		msg, err := r.ReadMessage(ctx)
+		msg, err := kafkaReader.ReadMessage(ctx)
 		var alert models.Alert
 		json.Unmarshal(msg.Value, &alert)
 		if err != nil {
