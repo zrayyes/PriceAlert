@@ -7,10 +7,11 @@
 - ~~Finish REST API~~
 - ~~Add Kafka~~
 - ~~Create separate producer/consumer modules~~
+- ~~Add alerts to Queue~~
+- ~~Add Mailhog~~
+- ~~Send out emails~~
 - Fetch prices from Crypto API
-- Add alerts to Queue
-- Consume alerts and change state
-- Add Mailhog
-- Send out emails
+- Add only active alerts to queue
+- Requeue on fail
 - Add tests for business logic
 - Godoc everything
