@@ -24,11 +24,16 @@ services:
         build: ./consumer
         volumes:
             - ./consumer:/consumer
+        depends_on:
+            - "kafka"
+            - "mailhog"
     producer:
         build: ./producer
         volumes:
             - ./producer:/producer
             - home:/home
+        depends_on:
+            - "kafka"
 
 volumes:
     home:

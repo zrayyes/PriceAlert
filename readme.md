@@ -10,8 +10,9 @@
 - ~~Add alerts to Queue~~
 - ~~Add Mailhog~~
 - ~~Send out emails~~
+- ~~Add only active alerts to queue~~
+- ~~Deactivate alert after adding to queue~~
 - Fetch prices from Crypto API
-- Add only active alerts to queue
 - Requeue on fail
 - Add tests for business logic
 - Godoc everything

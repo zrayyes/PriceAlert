@@ -9,6 +9,7 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/segmentio/kafka-go"
+	"github.com/zrayyes/PriceAlert/producer/api"
 	"github.com/zrayyes/PriceAlert/producer/models"
 )
 
@@ -35,18 +36,31 @@ func Produce() {
 	})
 
 	for {
-		var alert models.Alert
-		models.DB.Take(&alert, 1)
-		alertJSON, _ := json.Marshal(&alert)
+		coins := []string{"BTC"}
+		currencies := []string{"USD"}
+		results := api.GetCoinPrices(coins, currencies)
+		for _, coin := range coins {
+			for _, currency := range currencies {
+				price := results[coin][currency]
+				fmt.Printf("%s -> %s = %f\n", coin, currency, price)
 
-		err := kafkaWriter.WriteMessages(ctx, kafka.Message{
-			Value: alertJSON,
-		})
-		if err != nil {
-			fmt.Println("could not write message " + err.Error())
+				var alerts []models.Alert
+				models.DB.Where("coin = ? AND active = true AND price <= ?", coin, price).Find(&alerts)
+
+				for _, alert := range alerts {
+					alertJSON, _ := json.Marshal(&alert)
+					err := kafkaWriter.WriteMessages(ctx, kafka.Message{
+						Value: alertJSON,
+					})
+					if err != nil {
+						fmt.Println("could not write message " + err.Error())
+					}
+
+					models.DB.Model(&alert).Update("active", false)
+				}
+			}
 		}
-
-		time.Sleep(time.Second * 10)
+		time.Sleep(time.Second * 60)
 	}
 }
 
