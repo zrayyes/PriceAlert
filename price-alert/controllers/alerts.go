@@ -8,16 +8,20 @@ import (
 )
 
 type CreateAlertInput struct {
-	Email string  `json:"email" binding:"required"`
-	Coin  string  `json:"coin" binding:"required"`
-	Price float64 `json:"price" binding:"required"`
+	Email    string  `json:"email" binding:"required"`
+	Coin     string  `json:"coin" binding:"required"`
+	Currency string  `json:"currency" binding:"required"`
+	PriceMin float64 `json:"price_min" binding:"required"`
+	PriceMax float64 `json:"price_max" binding:"required"`
 }
 
 type UpdateAlertInput struct {
-	Email  string  `json:"email"`
-	Coin   string  `json:"coin"`
-	Price  float64 `json:"price"`
-	Active *bool   `json:"active"`
+	Email    string  `json:"email"`
+	Coin     string  `json:"coin"`
+	Currency string  `json:"currency"`
+	PriceMin float64 `json:"price_min"`
+	PriceMax float64 `json:"price_max"`
+	Active   *bool   `json:"active"`
 }
 
 // GET /alerts
@@ -53,7 +57,7 @@ func CreateAlert(c *gin.Context) {
 	}
 
 	// Create alert
-	alert := models.Alert{Email: input.Email, Coin: input.Coin, Price: input.Price}
+	alert := models.Alert{Email: input.Email, Coin: input.Coin, Currency: input.Currency, PriceMin: input.PriceMin, PriceMax: input.PriceMax}
 	models.DB.Create(&alert)
 
 	c.JSON(http.StatusOK, gin.H{"data": alert})

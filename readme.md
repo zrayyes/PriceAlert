@@ -12,9 +12,9 @@
 - ~~Send out emails~~
 - ~~Add only active alerts to queue~~
 - ~~Deactivate alert after adding to queue~~
-- **Switch to price range**
-- **Add currency tag**
-- Fetch prices from Crypto API
+- ~~Switch to price range~~
+- ~~Add currency tag~~
+- ~~Fetch prices from Crypto API~~
 - Requeue on fail
 - Add tests for business logic
 - Godoc everything

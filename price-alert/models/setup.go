@@ -28,9 +28,9 @@ func PopulateDataBase() {
 	DB.Model(&Alert{}).Count(&count)
 	if count == 0 {
 		fmt.Println("DB is empty, populating...")
-		DB.Create(&Alert{Email: "Blo558@gmail.com", Coin: "BTC", Price: 35650.20})
-		DB.Create(&Alert{Email: "xdy123@yahoo.com", Coin: "ETC", Price: 2336.27})
-		DB.Create(&Alert{Email: "MioSHA@hotmail.com", Coin: "ADA", Price: 1.440})
+		DB.Create(&Alert{Email: "Blo558@gmail.com", Coin: "BTC", Currency: "USD", PriceMin: 35650.20, PriceMax: 35651.20})
+		DB.Create(&Alert{Email: "xdy123@yahoo.com", Coin: "ETC", Currency: "EUR", PriceMin: 2336.27, PriceMax: 2340.0})
+		DB.Create(&Alert{Email: "MioSHA@hotmail.com", Coin: "ADA", Currency: "USD", PriceMin: 1.440, PriceMax: 1.640})
 	} else {
 		fmt.Println("DB is not empty, skipping population.")
 	}

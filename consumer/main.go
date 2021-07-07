@@ -37,7 +37,7 @@ func Consume() {
 
 	for {
 		msg, err := kafkaReader.ReadMessage(ctx)
-		var alert models.Alert
+		var alert models.AlertEvent
 		json.Unmarshal(msg.Value, &alert)
 		if err != nil {
 			panic("could not read message " + err.Error())
@@ -60,8 +60,8 @@ func Consume() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err = fmt.Fprintf(wc, "From: noreply@pricealert.com\nTo: %s\nSubject: New Price Alert\n\nThe coin %s has reached price $%f.",
-			alert.Email, alert.Coin, alert.Price)
+		_, err = fmt.Fprintf(wc, "From: noreply@pricealert.com\nTo: %s\nSubject: %s Price Alert\n\n%s has reached price %f %s.",
+			alert.Email, alert.Coin, alert.Coin, alert.Price, alert.Currency)
 		if err != nil {
 			log.Fatal(err)
 		}

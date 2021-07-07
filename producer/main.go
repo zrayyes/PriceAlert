@@ -37,7 +37,7 @@ func Produce() {
 
 	for {
 		coins := []string{"BTC", "ETC"}
-		currencies := []string{"USD"}
+		currencies := []string{"USD", "EUR"}
 		results := api.GetCoinPrices(coins, currencies)
 		for _, coin := range coins {
 			for _, currency := range currencies {
@@ -46,12 +46,13 @@ func Produce() {
 					fmt.Printf("%s -> %s = %f\n", coin, currency, price)
 
 					var alerts []models.Alert
-					models.DB.Where("coin = ? AND active = true AND price = ?", coin, price).Find(&alerts)
+					models.DB.Where("active = true AND coin = ? AND active = true AND currency = ? AND price_min <= ? AND price_max >= ?", coin, currency, price, price).Find(&alerts)
 
 					for _, alert := range alerts {
-						alertJSON, _ := json.Marshal(&alert)
+						alertEvent := models.AlertEvent{Email: alert.Email, Coin: alert.Coin, Currency: alert.Currency, Price: price}
+						alertEventJSON, _ := json.Marshal(&alertEvent)
 						err := kafkaWriter.WriteMessages(ctx, kafka.Message{
-							Value: alertJSON,
+							Value: alertEventJSON,
 						})
 						if err != nil {
 							fmt.Println("could not write message " + err.Error())
