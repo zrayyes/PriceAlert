@@ -36,27 +36,29 @@ func Produce() {
 	})
 
 	for {
-		coins := []string{"BTC"}
+		coins := []string{"BTC", "ETC"}
 		currencies := []string{"USD"}
 		results := api.GetCoinPrices(coins, currencies)
 		for _, coin := range coins {
 			for _, currency := range currencies {
 				price := results[coin][currency]
-				fmt.Printf("%s -> %s = %f\n", coin, currency, price)
+				if price != 0 {
+					fmt.Printf("%s -> %s = %f\n", coin, currency, price)
 
-				var alerts []models.Alert
-				models.DB.Where("coin = ? AND active = true AND price <= ?", coin, price).Find(&alerts)
+					var alerts []models.Alert
+					models.DB.Where("coin = ? AND active = true AND price = ?", coin, price).Find(&alerts)
 
-				for _, alert := range alerts {
-					alertJSON, _ := json.Marshal(&alert)
-					err := kafkaWriter.WriteMessages(ctx, kafka.Message{
-						Value: alertJSON,
-					})
-					if err != nil {
-						fmt.Println("could not write message " + err.Error())
+					for _, alert := range alerts {
+						alertJSON, _ := json.Marshal(&alert)
+						err := kafkaWriter.WriteMessages(ctx, kafka.Message{
+							Value: alertJSON,
+						})
+						if err != nil {
+							fmt.Println("could not write message " + err.Error())
+						}
+
+						models.DB.Model(&alert).Update("active", false)
 					}
-
-					models.DB.Model(&alert).Update("active", false)
 				}
 			}
 		}
