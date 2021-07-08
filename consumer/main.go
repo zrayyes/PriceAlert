@@ -27,6 +27,46 @@ func CreateTopic() {
 	}
 }
 
+func getAlertFromMessage(msg kafka.Message) models.AlertEvent {
+	var alert models.AlertEvent
+	json.Unmarshal(msg.Value, &alert)
+	return alert
+}
+
+func sendEmail(alert models.AlertEvent) error {
+	c, err := smtp.Dial("mailhog:1025")
+	if err != nil {
+		return err
+	}
+
+	if err := c.Mail("noreply@pricealert.com"); err != nil {
+		return err
+	}
+	if err := c.Rcpt(alert.Email); err != nil {
+		return err
+	}
+
+	wc, err := c.Data()
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintf(wc, "From: noreply@pricealert.com\nTo: %s\nSubject: %s Price Alert\n\n%s has reached price %f %s.",
+		alert.Email, alert.Coin, alert.Coin, alert.Price, alert.Currency)
+	if err != nil {
+		return err
+	}
+	err = wc.Close()
+	if err != nil {
+		return err
+	}
+
+	err = c.Quit()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func Consume() {
 	kafkaReader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{brokerAddress},
@@ -37,42 +77,14 @@ func Consume() {
 
 	for {
 		msg, err := kafkaReader.ReadMessage(ctx)
-		var alert models.AlertEvent
-		json.Unmarshal(msg.Value, &alert)
 		if err != nil {
 			panic("could not read message " + err.Error())
 		}
-		fmt.Println("received: ", alert.Email, alert.Coin, alert.Price)
+		alert := getAlertFromMessage(msg)
 
-		c, err := smtp.Dial("mailhog:1025")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if err := c.Mail("noreply@pricealert.com"); err != nil {
-			log.Fatal(err)
-		}
-		if err := c.Rcpt(alert.Email); err != nil {
-			log.Fatal(err)
-		}
-
-		wc, err := c.Data()
-		if err != nil {
-			log.Fatal(err)
-		}
-		_, err = fmt.Fprintf(wc, "From: noreply@pricealert.com\nTo: %s\nSubject: %s Price Alert\n\n%s has reached price %f %s.",
-			alert.Email, alert.Coin, alert.Coin, alert.Price, alert.Currency)
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = wc.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = c.Quit()
-		if err != nil {
-			log.Fatal(err)
+		if err := sendEmail(alert); err != nil {
+			fmt.Println(err.Error())
+			continue
 		}
 	}
 }
