@@ -16,6 +16,6 @@
 - ~~Switch to price range~~
 - ~~Add currency tag~~
 - ~~Fetch prices from Crypto API~~
-- **Add tests for business logic**
+- ~~Add tests for business logic~~
 - Godoc everything
 - Requeue on fail
