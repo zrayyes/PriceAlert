@@ -28,6 +28,22 @@ func CreateTopic() {
 	}
 }
 
+func getAlerts(coin string, currency string, price float64) []models.Alert {
+	var alerts []models.Alert
+	models.DB.Where("active = true AND coin = ? AND active = true AND currency = ? AND price_min <= ? AND price_max >= ?", coin, currency, price, price).Find(&alerts)
+	return alerts
+}
+
+func prepareAlertMessage(alert models.Alert, price float64) []byte {
+	alertEvent := models.AlertEvent{Email: alert.Email, Coin: alert.Coin, Currency: alert.Currency, Price: price}
+	alertEventJSON, _ := json.Marshal(&alertEvent)
+	return alertEventJSON
+}
+
+func disableAlert(alert models.Alert) {
+	models.DB.Model(&alert).Update("active", false)
+}
+
 func Produce() {
 	kafkaWriter := kafka.NewWriter(kafka.WriterConfig{
 		Brokers: []string{brokerAddress},
@@ -45,20 +61,14 @@ func Produce() {
 				if price != 0 {
 					fmt.Printf("%s -> %s = %f\n", coin, currency, price)
 
-					var alerts []models.Alert
-					models.DB.Where("active = true AND coin = ? AND active = true AND currency = ? AND price_min <= ? AND price_max >= ?", coin, currency, price, price).Find(&alerts)
-
-					for _, alert := range alerts {
-						alertEvent := models.AlertEvent{Email: alert.Email, Coin: alert.Coin, Currency: alert.Currency, Price: price}
-						alertEventJSON, _ := json.Marshal(&alertEvent)
+					for _, alert := range getAlerts(coin, currency, price) {
 						err := kafkaWriter.WriteMessages(ctx, kafka.Message{
-							Value: alertEventJSON,
+							Value: prepareAlertMessage(alert, price),
 						})
 						if err != nil {
 							fmt.Println("could not write message " + err.Error())
 						}
-
-						models.DB.Model(&alert).Update("active", false)
+						disableAlert(alert)
 					}
 				}
 			}
