@@ -18,4 +18,5 @@
 - ~~Fetch prices from Crypto API~~
 - ~~Add tests for business logic~~
 - ~~Godoc everything~~
+- ~~Retry on kafka fail~~
 - Requeue on fail

@@ -23,11 +23,13 @@ var topic = helpers.GetEnv("KAFKA_TOPIC", "message-log")
 var brokerAddress = fmt.Sprint(helpers.GetEnv("KAFKA_HOST", "kafka"), ":", helpers.GetEnv("KAFKA_PORT", "9092"))
 
 // Connect to the Kafka broker to create a topic
-func CreateTopic() {
+func CreateTopic() error {
 	_, err := kafka.DialLeader(ctx, "tcp", brokerAddress, topic, 0)
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
+		return err
 	}
+	return nil
 }
 
 // Get all active alerts that are within the price range from the database
@@ -93,6 +95,18 @@ func Produce() {
 
 func main() {
 	models.ConnectDataBase()
-	CreateTopic()
+	models.SetupDatabase()
+
+	connected := false
+	for !connected {
+		if err := CreateTopic(); err != nil {
+			fmt.Println("Failed to connected to Kafka, retrying in 15 seconds ...")
+			time.Sleep(time.Second * 15)
+		} else {
+			fmt.Println("Connected to Kafka.")
+			connected = true
+		}
+	}
+
 	Produce()
 }

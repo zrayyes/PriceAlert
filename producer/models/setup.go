@@ -19,3 +19,8 @@ func ConnectDataBase() {
 
 	DB = database
 }
+
+// Setup the database table(s)
+func SetupDatabase() {
+	DB.AutoMigrate(&Alert{})
+}

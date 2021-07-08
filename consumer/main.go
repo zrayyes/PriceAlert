@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/smtp"
 	"os"
+	"time"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/segmentio/kafka-go"
@@ -22,11 +23,13 @@ var brokerAddress = fmt.Sprint(helpers.GetEnv("KAFKA_HOST", "kafka"), ":", helpe
 var group = helpers.GetEnv("KAFKA_GROUP", "my-group")
 
 // Connect to the Kafka broker to create a topic
-func CreateTopic() {
+func CreateTopic() error {
 	_, err := kafka.DialLeader(ctx, "tcp", brokerAddress, topic, 0)
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
+		return err
 	}
+	return nil
 }
 
 // Return the Kafka event message as an AlertEvent Struct
@@ -109,6 +112,15 @@ func Consume() {
 }
 
 func main() {
-	CreateTopic()
+	connected := false
+	for !connected {
+		if err := CreateTopic(); err != nil {
+			fmt.Println("Failed to connected to Kafka, retrying in 15 seconds ...")
+			time.Sleep(time.Second * 15)
+		} else {
+			fmt.Println("Connected to Kafka.")
+			connected = true
+		}
+	}
 	Consume()
 }
