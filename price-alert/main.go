@@ -10,8 +10,18 @@ import (
 	"github.com/zrayyes/PriceAlert/price-alert/models"
 )
 
-func main() {
+func setupRouter() *gin.Engine {
 	r := gin.Default()
+	r.GET("/alerts", controllers.FindAlerts)
+	r.POST("/alerts", controllers.CreateAlert)
+	r.GET("/alerts/:id", controllers.FindAlert)
+	r.PATCH("/alerts/:id", controllers.UpdateAlert)
+	r.DELETE("/alerts/:id", controllers.DeleteAlert)
+	return r
+}
+
+func main() {
+	r := setupRouter()
 
 	models.ConnectDataBase()
 	models.SetupDatabase()
@@ -19,10 +29,5 @@ func main() {
 		models.PopulateDataBase()
 	}
 
-	r.GET("/alerts", controllers.FindAlerts)
-	r.POST("/alerts", controllers.CreateAlert)
-	r.GET("/alerts/:id", controllers.FindAlert)
-	r.PATCH("/alerts/:id", controllers.UpdateAlert)
-	r.DELETE("/alerts/:id", controllers.DeleteAlert)
 	r.Run(fmt.Sprintf(":%s", helpers.GetEnv("PORT", "8080")))
 }
