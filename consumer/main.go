@@ -33,6 +33,19 @@ func getAlertFromMessage(msg kafka.Message) models.AlertEvent {
 	return alert
 }
 
+func getEmailBody(alert models.AlertEvent) string {
+	// Sender
+	body := "From: noreply@pricealert.com\n"
+	// Reciever
+	body += fmt.Sprintf("To: %s\n", alert.Email)
+	// Subject line
+	body += fmt.Sprintf("%s Price Alert\n\n", alert.Coin)
+	// Body
+	body += fmt.Sprintf("%s has reached price %f %s.\n", alert.Coin, alert.Price, alert.Currency)
+
+	return body
+}
+
 func sendEmail(alert models.AlertEvent) error {
 	c, err := smtp.Dial("mailhog:1025")
 	if err != nil {
@@ -50,8 +63,7 @@ func sendEmail(alert models.AlertEvent) error {
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Fprintf(wc, "From: noreply@pricealert.com\nTo: %s\nSubject: %s Price Alert\n\n%s has reached price %f %s.",
-		alert.Email, alert.Coin, alert.Coin, alert.Price, alert.Currency)
+	_, err = fmt.Fprint(wc, getEmailBody(alert))
 	if err != nil {
 		return err
 	}
