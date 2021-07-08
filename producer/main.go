@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/segmentio/kafka-go"
 	"github.com/zrayyes/PriceAlert/producer/api"
+	"github.com/zrayyes/PriceAlert/producer/helpers"
 	"github.com/zrayyes/PriceAlert/producer/models"
 )
 
-const (
-	topic         = "message-log"
-	brokerAddress = "kafka:9092"
-)
+var topic = helpers.GetEnv("KAFKA_TOPIC", "message-log")
+var brokerAddress = fmt.Sprintf(helpers.GetEnv("KAFKA_HOST", "kafka"), ":", helpers.GetEnv("KAFKA_PORT", "9092"))
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var ctx = context.Background()
@@ -52,8 +52,8 @@ func Produce() {
 	})
 
 	for {
-		coins := []string{"BTC", "ETC"}
-		currencies := []string{"USD", "EUR"}
+		coins := strings.Split("BTC,ETC,BNB,XRP,DOT,USDT,DOGE,AXS,BUSD,ADA", ",")
+		currencies := strings.Split("USD,EUR,GBP,JPY", ",")
 		results := api.GetCoinPrices(coins, currencies)
 		for _, coin := range coins {
 			for _, currency := range currencies {

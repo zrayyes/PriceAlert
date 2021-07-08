@@ -3,12 +3,14 @@ package models
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/zrayyes/PriceAlert/producer/helpers"
 )
 
 var DB *gorm.DB
 
 func ConnectDataBase() {
-	database, err := gorm.Open("sqlite3", "/home/test.db")
+	DBPATH := helpers.GetEnv("DBPATH", "/home/test.db")
+	database, err := gorm.Open("sqlite3", DBPATH)
 
 	if err != nil {
 		panic("Failed to connect to database!")

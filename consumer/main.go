@@ -10,12 +10,12 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/segmentio/kafka-go"
 	"github.com/zrayyes/PriceAlert/consumer/models"
+	"github.com/zrayyes/PriceAlert/price-alert/helpers"
 )
 
-const (
-	topic         = "message-log"
-	brokerAddress = "kafka:9092"
-)
+var topic = helpers.GetEnv("KAFKA_TOPIC", "message-log")
+var brokerAddress = fmt.Sprintf(helpers.GetEnv("KAFKA_HOST", "kafka"), ":", helpers.GetEnv("KAFKA_PORT", "9092"))
+var group = helpers.GetEnv("KAFKA_GROUP", "my-group")
 
 var ctx = context.Background()
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -47,7 +47,8 @@ func getEmailBody(alert models.AlertEvent) string {
 }
 
 func sendEmail(alert models.AlertEvent) error {
-	c, err := smtp.Dial("mailhog:1025")
+	smtpAddress := fmt.Sprintf(helpers.GetEnv("SMTP_HOST", "mailhog"), ":", helpers.GetEnv("SMTP_PORT", "1025"))
+	c, err := smtp.Dial(smtpAddress)
 	if err != nil {
 		return err
 	}
@@ -83,7 +84,7 @@ func Consume() {
 	kafkaReader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{brokerAddress},
 		Topic:   topic,
-		GroupID: "my-group",
+		GroupID: group,
 		Logger:  log.New(os.Stdout, "kafka reader: ", 0),
 	})
 
