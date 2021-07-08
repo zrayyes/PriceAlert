@@ -23,21 +23,21 @@ type UpdateAlertInput struct {
 }
 
 type Alert struct {
+	ID       uint    `json:"id" gorm:"primary_key"`
 	Email    string  `json:"email" binding:"required"`
 	Coin     string  `json:"coin" binding:"required"`
 	Currency string  `json:"currency" binding:"required"`
 	PriceMin float64 `json:"price_min" binding:"required"`
 	PriceMax float64 `json:"price_max" binding:"required"`
 	Active   *bool   `json:"active" gorm:"default:true"`
-	ID       uint    `json:"id" gorm:"primary_key"`
-}
-
-func GetAlerts(alerts *[]Alert) error {
-	return DB.Find(&alerts).Error
 }
 
 func FindAlert(alert *Alert, id string) error {
 	return DB.Where("id = ?", id).First(&alert).Error
+}
+
+func GetAlerts(alerts *[]Alert) error {
+	return DB.Find(&alerts).Error
 }
 
 func CreateAlert(alert *Alert) error {
