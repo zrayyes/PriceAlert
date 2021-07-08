@@ -8,6 +8,7 @@ import (
 )
 
 // GET /alerts
+//
 // Get all alerts
 func FindAlerts(c *gin.Context) {
 	var alerts []models.Alert
@@ -21,6 +22,7 @@ func FindAlerts(c *gin.Context) {
 }
 
 // GET /alerts/:id
+//
 // Find an alert
 func FindAlert(c *gin.Context) {
 	var alert models.Alert
@@ -34,6 +36,7 @@ func FindAlert(c *gin.Context) {
 }
 
 // POST /alerts
+//
 // Create a new alert
 func CreateAlert(c *gin.Context) {
 	var input models.CreateAlertInput
@@ -54,6 +57,7 @@ func CreateAlert(c *gin.Context) {
 }
 
 // PATCH /alerts/:id
+//
 // Update an alert
 func UpdateAlert(c *gin.Context) {
 	var alert models.Alert
@@ -78,6 +82,7 @@ func UpdateAlert(c *gin.Context) {
 }
 
 // DELETE /alerts/:id
+//
 // Delete an alert
 func DeleteAlert(c *gin.Context) {
 	// Get model if exist

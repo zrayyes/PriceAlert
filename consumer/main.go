@@ -9,17 +9,19 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/segmentio/kafka-go"
+	"github.com/zrayyes/PriceAlert/consumer/helpers"
 	"github.com/zrayyes/PriceAlert/consumer/models"
-	"github.com/zrayyes/PriceAlert/price-alert/helpers"
 )
-
-var topic = helpers.GetEnv("KAFKA_TOPIC", "message-log")
-var brokerAddress = fmt.Sprintf(helpers.GetEnv("KAFKA_HOST", "kafka"), ":", helpers.GetEnv("KAFKA_PORT", "9092"))
-var group = helpers.GetEnv("KAFKA_GROUP", "my-group")
 
 var ctx = context.Background()
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
+// Kafka values
+var topic = helpers.GetEnv("KAFKA_TOPIC", "message-log")
+var brokerAddress = fmt.Sprint(helpers.GetEnv("KAFKA_HOST", "kafka"), ":", helpers.GetEnv("KAFKA_PORT", "9092"))
+var group = helpers.GetEnv("KAFKA_GROUP", "my-group")
+
+// Connect to the Kafka broker to create a topic
 func CreateTopic() {
 	_, err := kafka.DialLeader(ctx, "tcp", brokerAddress, topic, 0)
 	if err != nil {
@@ -27,12 +29,14 @@ func CreateTopic() {
 	}
 }
 
+// Return the Kafka event message as an AlertEvent Struct
 func getAlertFromMessage(msg kafka.Message) models.AlertEvent {
 	var alert models.AlertEvent
 	json.Unmarshal(msg.Value, &alert)
 	return alert
 }
 
+// Create the email body in a RFC 822 message format
 func getEmailBody(alert models.AlertEvent) string {
 	// Sender
 	body := "From: noreply@pricealert.com\n"
@@ -46,8 +50,9 @@ func getEmailBody(alert models.AlertEvent) string {
 	return body
 }
 
+// Send out an email to the address declared in the alert
 func sendEmail(alert models.AlertEvent) error {
-	smtpAddress := fmt.Sprintf(helpers.GetEnv("SMTP_HOST", "mailhog"), ":", helpers.GetEnv("SMTP_PORT", "1025"))
+	smtpAddress := fmt.Sprint(helpers.GetEnv("SMTP_HOST", "mailhog"), ":", helpers.GetEnv("SMTP_PORT", "1025"))
 	c, err := smtp.Dial(smtpAddress)
 	if err != nil {
 		return err
@@ -68,18 +73,18 @@ func sendEmail(alert models.AlertEvent) error {
 	if err != nil {
 		return err
 	}
-	err = wc.Close()
-	if err != nil {
+
+	if err = wc.Close(); err != nil {
 		return err
 	}
 
-	err = c.Quit()
-	if err != nil {
+	if err = c.Quit(); err != nil {
 		return err
 	}
 	return nil
 }
 
+// Start the Kafka consumer
 func Consume() {
 	kafkaReader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{brokerAddress},
@@ -91,7 +96,8 @@ func Consume() {
 	for {
 		msg, err := kafkaReader.ReadMessage(ctx)
 		if err != nil {
-			panic("could not read message " + err.Error())
+			fmt.Println("could not read message: ", err.Error())
+			continue
 		}
 		alert := getAlertFromMessage(msg)
 

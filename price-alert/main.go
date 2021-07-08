@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zrayyes/PriceAlert/price-alert/controllers"
@@ -21,13 +20,9 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
-	r := setupRouter()
-
 	models.ConnectDataBase()
 	models.SetupDatabase()
-	if os.Getenv("GIN_MODE") != gin.ReleaseMode {
-		models.PopulateDataBase()
-	}
 
+	r := setupRouter()
 	r.Run(fmt.Sprintf(":%s", helpers.GetEnv("PORT", "8080")))
 }

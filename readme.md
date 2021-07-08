@@ -17,5 +17,5 @@
 - ~~Add currency tag~~
 - ~~Fetch prices from Crypto API~~
 - ~~Add tests for business logic~~
-- Godoc everything
+- ~~Godoc everything~~
 - Requeue on fail

@@ -8,6 +8,7 @@ import (
 
 var DB *gorm.DB
 
+// Connect to the sqlite3 database
 func ConnectDataBase() {
 	DBPATH := helpers.GetEnv("DBPATH", "/home/test.db")
 	database, err := gorm.Open("sqlite3", DBPATH)

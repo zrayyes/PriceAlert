@@ -1,9 +1,6 @@
 package models
 
-import (
-	_ "github.com/jinzhu/gorm"
-)
-
+// Struct that represents a Kafka event carrying an Alert
 type AlertEvent struct {
 	Email    string  `json:"email"`
 	Coin     string  `json:"coin"`

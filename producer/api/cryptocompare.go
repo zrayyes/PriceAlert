@@ -4,23 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 )
 
+// Return a JSON map of crypto coin prices in the given currencies
 func GetCoinPrices(coins []string, currencies []string) map[string]map[string]float64 {
 	var results map[string]map[string]float64
-	// body := `{"BTC":{"USD":34554.5},"ETC":{"EUR":45.55}}`
 
 	resp, err := http.Get(fmt.Sprintf("https://min-api.cryptocompare.com/data/pricemulti?fsyms=%s&tsyms=%s", strings.Join(coins, ","), strings.Join(currencies, ",")))
 	if err != nil {
-		log.Fatalln("Cant connect to API.")
+		fmt.Println("GetCoinPrices: Cant connect to API: ", err.Error())
+		return results
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("GetCoinPrices: Cant read body: ", err.Error())
+		return results
 	}
 	json.Unmarshal([]byte(body), &results)
 	return results

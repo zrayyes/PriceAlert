@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Start a db in memory and populate it with test data
 func SetUpTestDB() {
 	db, _ := gorm.Open("sqlite3", "file::memory:")
 	DB = db
@@ -16,13 +17,14 @@ func SetUpTestDB() {
 
 func TestFindAlert(t *testing.T) {
 	SetUpTestDB()
-	// Alert exists
+
+	// Confirm that an alert exists
 	var alert1 Alert
 	FindAlert(&alert1, "1")
 	assert.Equal(t, alert1.Coin, "BTC")
 	assert.Equal(t, alert1.PriceMin, 35650.20)
 
-	// Alert that does not exist
+	// Confirm that an alert does not exist
 	var alert2 Alert
 	FindAlert(&alert2, "5")
 	assert.Equal(t, alert2.Email, "")
@@ -31,6 +33,8 @@ func TestFindAlert(t *testing.T) {
 
 func TestGetAlerts(t *testing.T) {
 	SetUpTestDB()
+
+	// Get a list of all alerts
 	var alerts []Alert
 	GetAlerts(&alerts)
 	assert.Len(t, alerts, 3)
@@ -40,38 +44,37 @@ func TestGetAlerts(t *testing.T) {
 
 func TestCreateAlert(t *testing.T) {
 	SetUpTestDB()
-	// Before creation
+
+	// Confirm the length before creation
 	var alertsBefore []Alert
 	GetAlerts(&alertsBefore)
 	assert.Len(t, alertsBefore, 3)
 
-	// Create Alert
+	// Create a new alert
 	alert := Alert{Email: "justForTesting", Coin: "XYZ", Currency: "ABC", PriceMin: 55, PriceMax: 56}
 	CreateAlert(&alert)
 
-	// Check that alert was added
+	// Check that an alert was added
 	var alertsAfter []Alert
 	GetAlerts(&alertsAfter)
 	assert.Len(t, alertsAfter, 4)
 	assert.Contains(t, alertsAfter, alert)
-
-	alert.Email = "NotAValidEmail"
-	assert.NotContains(t, alertsAfter, alert)
 }
 
 func TestUpdateAlert(t *testing.T) {
 	SetUpTestDB()
+
 	// Find an existing alert
 	var alert1 Alert
 	fakeEmail := "justForTestingAgain"
 	FindAlert(&alert1, "1")
 	assert.NotEqual(t, alert1.Email, fakeEmail)
 
-	// Update email
+	// Update the email for the existing alert
 	input := UpdateAlertInput{Email: fakeEmail}
 	UpdateAlert(&alert1, input)
 
-	// Find the same alert
+	// Confirm that the email was changed
 	var alert2 Alert
 	FindAlert(&alert2, "1")
 	assert.Equal(t, alert2.Email, fakeEmail)
@@ -83,16 +86,16 @@ func TestDeleteAlert(t *testing.T) {
 	alert := Alert{Email: "justForTesting", Coin: "XYZ", Currency: "ABC", PriceMin: 55, PriceMax: 56}
 	CreateAlert(&alert)
 
-	// Get alerts before delete
+	// Confirm that the alert was created
 	var alertsBefore []Alert
 	GetAlerts(&alertsBefore)
 	assert.Len(t, alertsBefore, 4)
 	assert.Contains(t, alertsBefore, alert)
 
-	// Delete Alert
+	// Delete the alert
 	DeleteAlert(&alert)
 
-	// Get alerts after delete
+	// Confirm that the alert was deleted
 	var alertsAfter []Alert
 	GetAlerts(&alertsAfter)
 	assert.Len(t, alertsAfter, 3)

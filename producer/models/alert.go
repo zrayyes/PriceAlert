@@ -1,9 +1,6 @@
 package models
 
-import (
-	_ "github.com/jinzhu/gorm"
-)
-
+// Price alert structure Database/JSON mapping
 type Alert struct {
 	ID       uint    `json:"id" gorm:"primary_key"`
 	Email    string  `json:"email"`
@@ -14,6 +11,7 @@ type Alert struct {
 	Active   *bool   `json:"active" gorm:"default:true"`
 }
 
+// Struct that represents a Kafka event carrying an Alert
 type AlertEvent struct {
 	Email    string  `json:"email"`
 	Coin     string  `json:"coin"`
