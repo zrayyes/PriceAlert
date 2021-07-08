@@ -28,7 +28,11 @@ type UpdateAlertInput struct {
 // Get all alerts
 func FindAlerts(c *gin.Context) {
 	var alerts []models.Alert
-	models.DB.Find(&alerts)
+
+	if err := models.DB.Find(&alerts).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"data": alerts})
 }
@@ -58,7 +62,10 @@ func CreateAlert(c *gin.Context) {
 
 	// Create alert
 	alert := models.Alert{Email: input.Email, Coin: input.Coin, Currency: input.Currency, PriceMin: input.PriceMin, PriceMax: input.PriceMax}
-	models.DB.Create(&alert)
+	if err := models.DB.Create(&alert).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"data": alert})
 }
@@ -79,7 +86,10 @@ func UpdateAlert(c *gin.Context) {
 		return
 	}
 
-	models.DB.Model(&alert).Updates(input)
+	if err := models.DB.Model(&alert).Updates(input).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to Update!"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"data": alert})
 }
@@ -94,6 +104,10 @@ func DeleteAlert(c *gin.Context) {
 		return
 	}
 
+	if err := models.DB.Delete(&alert).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to Delete!"})
+		return
+	}
 	models.DB.Delete(&alert)
 
 	c.JSON(http.StatusOK, gin.H{"data": true})

@@ -5,12 +5,14 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/zrayyes/PriceAlert/price-alert/helpers"
 )
 
 var DB *gorm.DB
 
 func ConnectDataBase() {
-	database, err := gorm.Open("sqlite3", "/home/test.db")
+	DBPATH := helpers.GetEnv("DBPATH", "/home/test.db")
+	database, err := gorm.Open("sqlite3", DBPATH)
 
 	if err != nil {
 		panic("Failed to connect to database!")
@@ -25,7 +27,10 @@ func SetupDatabase() {
 
 func PopulateDataBase() {
 	count := int64(0)
-	DB.Model(&Alert{}).Count(&count)
+	if err := DB.Model(&Alert{}).Count(&count).Error; err != nil {
+		fmt.Println("PopulateDataBase: ", err.Error())
+		return
+	}
 	if count == 0 {
 		fmt.Println("DB is empty, populating...")
 		DB.Create(&Alert{Email: "Blo558@gmail.com", Coin: "BTC", Currency: "USD", PriceMin: 35650.20, PriceMax: 35651.20})
