@@ -4,7 +4,6 @@ services:
     price-alert:
         build: ./price-alert
         volumes:
-            - ./price-alert:/price-alert
             - home:/home
         environment: 
             - PORT=8080
@@ -22,15 +21,12 @@ services:
             - 8025:8025 # HTTP Server
     consumer:
         build: ./consumer
-        volumes:
-            - ./consumer:/consumer
         depends_on:
             - "kafka"
             - "mailhog"
     producer:
         build: ./producer
         volumes:
-            - ./producer:/producer
             - home:/home
         depends_on:
             - "kafka"

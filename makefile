@@ -2,9 +2,9 @@ default:
 	@echo "=============building Local API============="
 	docker build -f price-alert/Dockerfile -t price-alert .
 
-up: default
+up:
 	@echo "=============starting api locally============="
-	docker-compose up
+	docker-compose up --build
 
 logs:
 	docker-compose logs -f
