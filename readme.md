@@ -22,7 +22,7 @@ This program was tested on Docker v20.10.7 running on Windows 10 build 19043.108
 ----------
 ## Usage
 
-To setup an alert, send a POST request to /alerts with the appropriate information
+To create an alert, send a POST request to /alerts with the appropriate information
 
     {
         "email":"BTCLOVE@gmail.com", // The email address to send the alert to
@@ -45,13 +45,13 @@ An overview of all the endpoints and their usage is available under docs/price-a
 ----------
 ## Notes
 1. I was not able to find a way to share code between my Go modules (server, producer, consumer). Unless Go has a way to accomplish this, I would split the modules into separate Git repositories, and share the code via Git Submodules.
-2. I only used an SQLite database because this was a coding assessment; For a production service I would look into using something more appropriate.
-3. Given the time restriction, I was not able to setup proper database call mocking for unit testing, and instead decided to use an in-memory database with test data instead.
-4. The Kafka consumer does not handle failure properly. If an error happens during the consumption of an event, the information is lost. A possible solution is to requeue the event on failure, and contact an administrator if it fails more than once.
+2. I only used an SQLite database because this was a coding assessment; For a production service, I would look into using something more appropriate.
+3. Given the time restriction, I was not able to set up proper database call mocking for unit testing and decided instead to use an in-memory database with test data instead.
+4. The Kafka consumer does not handle failure properly. If an error happens during the consumption of an event, the information is lost. A possible solution is to re-queue the event on failure and contact an administrator if it fails more than once.
 5. I also did not include any tests for the Kafka producer/consumer. This is primarily due to lack of time and my inexperience with the Kafka platform.
 6. I currently have the list of coins/currencies hardcoded. In a real service, I would have this inside a database to also allow for validation while creating an alert.
-7. I made the decision to disable a price alert after it is sent to the queue. The same alert can be enabled by sending a PATCH request to alerts/:id and body {"active": true} .
-8. A feature I didn’t have time to implement was to define what coins/currencies a producer handled via cli. This would for example, allow you to start one producer for USD alerts and another for EUR alerts, to reduce the pressure on the one producer.
+7. I decided to disable a price alert after it is sent to the queue. The same alert can be enabled by sending a PATCH request to alerts/:id and body {"active": true}.
+8. A feature I didn’t have time to implement was to define what coins/currencies a producer handled via CLI. This would, for example, allow you to start one producer for USD alerts and another for EUR alerts, to reduce the pressure on the one producer.
 
 ## Todo
 
