@@ -3,7 +3,7 @@ Price Alert is a service that helps you keep track of Cryptocurrency prices.
 
 ## Installation
 
-Requirements**:**
+Requirements:
 
 - Docker
 
