@@ -12,8 +12,11 @@ In the root folder of the project, start docker compose
     docker-compose up --build
 
 Price Alert defaults to port **5001**
+
 Kafka’s UI defaults to port **5002**
+
 Mailhog’s UI defaults to port **8025**
+
 These ports can be managed inside docker-compose.yml
 
 **Please Note: Kafka’s container takes a couple of minutes to start.**
