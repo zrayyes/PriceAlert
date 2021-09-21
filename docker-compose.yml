@@ -1,35 +1,41 @@
-version: '3.9'
+version: "3.9"
 
 services:
-    price-alert:
-        build: ./price-alert
-        volumes:
-            - home:/home
-        environment: 
-            - PORT=8080
-        ports:
-            - 5001:8080
-    kafka:
-        image: lensesio/fast-data-dev:latest
-        ports:
-            - 5002:3030
-        environment:
-            - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
-    mailhog:
-        image: mailhog/mailhog:latest
-        ports:
-            - 8025:8025 # HTTP Server
-    consumer:
-        build: ./consumer
-        depends_on:
-            - "kafka"
-            - "mailhog"
-    producer:
-        build: ./producer
-        volumes:
-            - home:/home
-        depends_on:
-            - "kafka"
+  price-alert:
+    build:
+      context: ./price-alert
+      target: prod
+    volumes:
+      - home:/home
+    environment:
+      - PORT=8080
+    ports:
+      - 5001:8080
+  kafka:
+    image: lensesio/fast-data-dev:latest
+    ports:
+      - 5002:3030
+    environment:
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - 8025:8025 # HTTP Server
+  consumer:
+    build:
+      context: ./consumer
+      target: prod
+    depends_on:
+      - "kafka"
+      - "mailhog"
+  producer:
+    build:
+      context: ./producer
+      target: prod
+    volumes:
+      - home:/home
+    depends_on:
+      - "kafka"
 
 volumes:
-    home:
+  home:

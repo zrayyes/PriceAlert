@@ -6,6 +6,9 @@ up:
 	@echo "=============starting api locally============="
 	docker-compose up --build
 
+dev:
+	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build --abort-on-container-exit
+
 logs:
 	docker-compose logs -f
 

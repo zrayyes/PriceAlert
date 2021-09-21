@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  price-alert:
+    build:
+      target: dev
+    volumes:
+      - ./price-alert:/app
+  consumer:
+    build:
+      target: dev
+    volumes:
+      - ./consumer:/app
+  producer:
+    build:
+      target: dev
+    volumes:
+      - ./producer:/app

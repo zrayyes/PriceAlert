@@ -1,8 +1,8 @@
-version: '3.9'
+version: "3.9"
 
 services:
-    price-alert_tests:
-        build:
-            dockerfile: ./price-alert/Dockerfile.test
-        volumes:
-            - ./price-alert:/price-alert
+  price-alert_tests:
+    build:
+      dockerfile: ./price-alert/Dockerfile.test
+    volumes:
+      - ./price-alert:/price-alert
